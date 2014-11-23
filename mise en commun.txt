@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import sys
 
-def getSize(meshName):
+def getSizeX(meshName):
     xOrig = cmds.xform(meshName+'.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     minX = sys.maxsize
@@ -11,7 +11,19 @@ def getSize(meshName):
             maxX=pos[0]
         if(pos[0]<minX):
             minX=pos[0]
-    return((maxX-minX)/10)
+    return([(maxX-minX),(maxX-abs(minX))])
+
+def getSizeY(meshName):
+    xOrig = cmds.xform(meshName+'.vtx[*]', q=True, ws=True, t=True)
+    origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
+    minY = sys.maxsize
+    maxY = -sys.maxsize
+    for pos in origPts:
+        if(pos[1]>maxY):
+            maxY=pos[1]
+        if(pos[1]<minY):
+            minY=pos[1]
+    return([(maxY-minY),minY])
 
 def createListRig(list,nameElement,ikHandleBase=None):
     for index in range(len(list)):
@@ -23,7 +35,8 @@ def createListRig(list,nameElement,ikHandleBase=None):
         cmds.ikHandle( sj=nameElement + str(index))
 
 def getZ(x, y,meshName):
-    size = getSize(meshName)
+    size = getSizeX(meshName)
+    size = size[0]/10
     xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     nbPoints = 0
@@ -36,6 +49,37 @@ def getZ(x, y,meshName):
     if(nbPoints>0):
         valZ = totalZ/nbPoints
     return(valZ)
+
+def autoSize(meshName):
+    height = getSizeY(meshName)
+    minPosY = height[1]
+    height = height[0]
+    width = getSizeX(meshName)
+    minPosX = width[1]
+    width = width[0]
+    bassinPoint = (minPosX + width * 0.0,minPosY + height * 0.48,getZ(minPosX + width * 0.0,minPosY + height * 0.48,meshName))
+    couPoint = (minPosX + width * 0.0,minPosY + height * 0.870,getZ(minPosX + width * 0.0,minPosY + height * 0.870,meshName))
+    epaulePoint = (minPosX + width * 0.129,minPosY + height * 0.825,getZ(minPosX + width * 0.129,minPosY + height * 0.825,meshName))
+    coudePoint = (minPosX + width * 0.315,minPosY + height * 0.825,getZ(minPosX + width * 0.315,minPosY + height * 0.825,meshName))
+    poignetPoint = (minPosX + width * 0.461,minPosY + height * 0.825,getZ(minPosX + width * 0.461,minPosY + height * 0.825,meshName))
+    jambePoint = (minPosX + width * 0.0955,minPosY + height * 0.4,getZ(minPosX + width * 0.0955,minPosY + height * 0.4,meshName))
+    genouPoint = (minPosX + width * 0.1,minPosY + height * 0.285,getZ(minPosX + width * 0.1,minPosY + height * 0.285,meshName))
+    piedPoint = (minPosX + width * 0.12,minPosY + height * 0.039 ,getZ(minPosX + width * 0.12,minPosY + height * 0.039,meshName))
+    
+    cmds.joint(p=bassinPoint,name="bassinBase")
+    rigList = [couPoint,epaulePoint,coudePoint,poignetPoint]
+    createListRig(rigList,"rigTop","bassinBase")
+    cmds.select("bassinBase")
+    rigList2 = [jambePoint,genouPoint,piedPoint]
+    createListRig(rigList2,"rigBot","bassinBase")
+    cmds.select("rigTop1")
+    cmds.mirrorJoint(mirrorYZ=True)
+    cmds.select("rigBot0")
+    cmds.mirrorJoint(mirrorYZ=True)
+    cmds.select("bassinBase")
+    cmds.select(meshName,tgl=True)
+    cmds.bindSkin()
+    
 
 meshName = 'proxy741Mesh'
 poignetPoint = (-2.430,5.842,getZ(-2.430,5.842,meshName))
