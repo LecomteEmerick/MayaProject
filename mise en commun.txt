@@ -1,8 +1,8 @@
 import maya.cmds as cmds
 import sys
 
-def getSize():
-    xOrig = cmds.xform('baseMesh.vtx[*]', q=True, ws=True, t=True)
+def getSize(meshName):
+    xOrig = cmds.xform(meshName+'.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     minX = sys.maxsize
     maxX = -sys.maxsize
@@ -12,7 +12,6 @@ def getSize():
         if(pos[0]<minX):
             minX=pos[0]
     return((maxX-minX)/10)
-
 
 def createListRig(list,nameElement,ikHandleBase=None):
     for index in range(len(list)):
@@ -24,7 +23,7 @@ def createListRig(list,nameElement,ikHandleBase=None):
         cmds.ikHandle( sj=nameElement + str(index))
 
 def getZ(x, y,meshName):
-	size = getSize()
+    size = getSize(meshName)
     xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     nbPoints = 0
@@ -36,7 +35,6 @@ def getZ(x, y,meshName):
             nbPoints+=1
     if(nbPoints>0):
         valZ = totalZ/nbPoints
-    print(nbPoints)
     return(valZ)
 
 meshName = 'proxy741Mesh'
@@ -55,3 +53,6 @@ createListRig(rigList,"rigTop","bassinBase")
 cmds.select("bassinBase")
 rigList2 = [jambePoint,genouPoint,piedPoint]
 createListRig(rigList2,"rigBot","bassinBase")
+cmds.select("bassinBase")
+cmds.select(meshName,tgl=True)
+cmds.bindSkin()
