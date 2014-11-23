@@ -21,6 +21,7 @@ def createListRig(list,nameElement,ikHandleBase=None):
     for index in range(len(list)-1) :
         cmds.select(nameElement + str(index+1))
         cmds.ikHandle( sj=nameElement + str(index))
+
 def getZ(x, y,meshName):
     size = getSize(meshName)
     xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
@@ -36,7 +37,7 @@ def getZ(x, y,meshName):
         valZ = totalZ/nbPoints
     return(valZ)
 
-meshName = 'baseMesh'
+meshName = 'proxy741Mesh'
 poignetPoint = (-2.430,5.842,getZ(-2.430,5.842,meshName))
 coudePoint = (-1.794,6.485,getZ(-1.794,6.485,meshName))
 epaulePoint = (-1.163,7.392,getZ(-1.163,7.392,meshName))
@@ -52,6 +53,10 @@ createListRig(rigList,"rigTop","bassinBase")
 cmds.select("bassinBase")
 rigList2 = [jambePoint,genouPoint,piedPoint]
 createListRig(rigList2,"rigBot","bassinBase")
+cmds.select("rigTop1")
+cmds.mirrorJoint(mirrorYZ=True)
+cmds.select("rigBot0")
+cmds.mirrorJoint(mirrorYZ=True)
 cmds.select("bassinBase")
 cmds.select(meshName,tgl=True)
 cmds.bindSkin()
