@@ -1,4 +1,18 @@
 import maya.cmds as cmds
+import sys
+
+def getSize():
+    xOrig = cmds.xform('baseMesh.vtx[*]', q=True, ws=True, t=True)
+    origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
+    minX = sys.maxsize
+    maxX = -sys.maxsize
+    for pos in origPts:
+        if(pos[0]>maxX):
+            maxX=pos[0]
+        if(pos[0]<minX):
+            minX=pos[0]
+    return((maxX-minX)/10)
+
 
 def createListRig(list,nameElement,ikHandleBase=None):
     for index in range(len(list)):
@@ -10,13 +24,14 @@ def createListRig(list,nameElement,ikHandleBase=None):
         cmds.ikHandle( sj=nameElement + str(index))
 
 def getZ(x, y,meshName):
+	size = getSize()
     xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     nbPoints = 0
     totalZ = 0
     valZ = 0
     for pos in origPts:
-        if(x-2<pos[0] and x+2>pos[0] and y-2<pos[1] and y+2>pos[1]):
+        if(x-size<pos[0] and x+size>pos[0] and y-size<pos[1] and y+size>pos[1]):
             totalZ+=pos[2]
             nbPoints+=1
     if(nbPoints>0):
