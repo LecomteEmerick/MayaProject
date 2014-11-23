@@ -1,8 +1,8 @@
 import maya.cmds as cmds
 import sys
 
-def getSize():
-    xOrig = cmds.xform('baseMesh.vtx[*]', q=True, ws=True, t=True)
+def getSize(meshName):
+    xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     minX = sys.maxsize
     maxX = -sys.maxsize
@@ -22,9 +22,8 @@ def createListRig(list,nameElement,ikHandleBase=None):
     for index in range(len(list)-1) :
         cmds.select(nameElement + str(index+1))
         cmds.ikHandle( sj=nameElement + str(index))
-
 def getZ(x, y,meshName):
-	size = getSize()
+    size = getSize(meshName)
     xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     nbPoints = 0
@@ -36,10 +35,9 @@ def getZ(x, y,meshName):
             nbPoints+=1
     if(nbPoints>0):
         valZ = totalZ/nbPoints
-    print(nbPoints)
     return(valZ)
 
-meshName = 'proxy741Mesh'
+meshName = 'baseMesh'
 poignetPoint = (-2.430,5.842,getZ(-2.430,5.842,meshName))
 coudePoint = (-1.794,6.485,getZ(-1.794,6.485,meshName))
 epaulePoint = (-1.163,7.392,getZ(-1.163,7.392,meshName))
