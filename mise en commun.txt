@@ -2,11 +2,7 @@ import maya.cmds as cmds
 import sys
 
 def getSize(meshName):
-<<<<<<< HEAD
     xOrig = cmds.xform(meshName+'.vtx[*]', q=True, ws=True, t=True)
-=======
-    xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
->>>>>>> origin/master
     origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
     minX = sys.maxsize
     maxX = -sys.maxsize
