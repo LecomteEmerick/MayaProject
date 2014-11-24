@@ -131,7 +131,7 @@ class AutorigginUI :
 
 		# Mesh selector
 		self.meshSelector = cmds.optionMenu(w=self.width,h=30,label="Choisissez un Mesh :")
-		for m in cmds.ls(type="mesh"):
+		for m in cmds.ls(type="transform"):
 			cmds.menuItem(label=str(m))
 
 		cmds.separator(h=40)
@@ -462,19 +462,19 @@ class AutorigginUI :
 
 
 	def getZ(self,x, y,meshName):
-		size = self.getSizeX(meshName)[0]/10
+		size = self.getSizeY(meshName)[0]/10
 		xOrig = cmds.xform( meshName + '.vtx[*]', q=True, ws=True, t=True)
 		origPts = zip(xOrig[0::3], xOrig[1::3], xOrig[2::3])
 		nbPoints = 0
 		totalZ = 0
 		valZ = 0
 		for pos in origPts:
-			if(x-2<pos[0] and x+2>pos[0] and y-2<pos[1] and y+2>pos[1]):
+			if(x-size<pos[0] and x+size>pos[0] and y-size<pos[1] and y+size>pos[1]):
 				totalZ+=pos[2]
 				nbPoints+=1
-			if(nbPoints>0):
-				valZ = totalZ/nbPoints
-			return(valZ)
+		if(nbPoints>0):
+			valZ = totalZ/nbPoints
+		return(valZ)
 			
 	def autoRig(self,meshName):
 		height = self.getSizeY(meshName)
